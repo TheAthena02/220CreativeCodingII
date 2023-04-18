@@ -8,7 +8,11 @@ let objectArr;
 let fruit, fruitB;
 var gameOver = false;
 var score = 0;
-var life = 3;
+var tempX = 0;
+var tempY = 0;
+var particle;
+//var life = 3;
+let smoke;
 function preload() {
 
     idleSet = loadStrings("./images/idle/idle.txt");
@@ -20,7 +24,7 @@ function preload() {
 
 function setup() {
     createCanvas(800,600);
-    
+    allSprites.autoCull = false;
 
 
     //player sprite creation
@@ -31,7 +35,7 @@ function setup() {
     player.addAni("slide", slideSet);
     player.pos = {x: 200, y: 200};
     player.scale = .3;
-    player.health = 1;
+    player.health = 3;
 
 
 
@@ -41,25 +45,47 @@ function setup() {
         spriteTemp = new objectArr.Sprite(random(0,800), random(0,600), 50, 50,  'static');
         
     }
-
-    fruit = new Sprite(random(0,800), random(0,600), 50,  'static');
+    //fruit creation
+    fruit = new Group();
+    fruit.x = () => random(0, canvas.w);
+	fruit.y = () => random(0, canvas.h);
+    fruit.d = 50;
+    fruit.collider = 'kinematic';
     fruit.color = "red";
-
-    fruitB = new Sprite(random(0,800), random(0,600), 50,  'static');
+    //fruit.health = 3;
+    fruit.amount = 5;
+    //bad fruit creation
+    fruitB = new Group();
+    fruitB.x = () => random(0, canvas.w);
+	fruitB.y = () => random(0, canvas.h);
+    fruitB.d = 50;
+    fruitB.collider = 'kinematic';
     fruitB.color = "green";
+    fruitB.amount = 3;
     
+
+    
+    //collison connection
+    player.collide(fruit, goodFood);
+
+    player.collide(fruitB, badFood);
+ 
 }
 
 function draw() {
     background(120);
     gameStateHandler();
     player.ani = "idle";
-    
+    /*
+    if(smoke.cull(-200)) {
+        new smoke.Sprite();
+    }
+    */
     scoreDisplay();
     if(!gameOver) {
         movementHandler();
-        goodFood();
-        badFood();
+        //goodFood();
+        //badFood();
     }
     
     
@@ -109,23 +135,40 @@ function movementHandler () {
 
 }
 
-function goodFood() {
-    if(fruit.collides(player)) {
-        score += 1;
-        fruit.pos = {x: random(0,800), y: random(0,600)};
+function goodFood(player, fruitOne) {
+    
+    
+    
+    if(kb.pressing('space')) {
+        //fruitOne.health -= 1;
         
-    }
+        particle = new particleSystem(fruitOne.x, fruitOne.y, "white");
+        
+        score += 1;
+        fruitOne.remove();
+        
+    } 
 
 }
-function badFood() {
-    if(fruitB.collides(player)) {
-        life -= 1;
-        fruitB.pos = {x: random(0,800), y: random(0,600)};
-    }
+
+function badFood(player, fruitOne) {
+    
+    
+    
+    if(kb.pressing('space')) {
+        //fruitOne.health -= 1;
+        
+        particle = new particleSystem(fruitOne.x, fruitOne.y, "lime");
+        
+        player.health -= 1;
+        fruitOne.remove();
+        
+    } 
+
 }
 
 function gameStateHandler() {
-    if (score >= 10) {
+    if (score >= 5) {
         gameOver = true;
         fill('white');
         textAlign("center");
@@ -135,7 +178,7 @@ function gameStateHandler() {
         player.vel.y = 0;
     }
 
-    else if (life <= 0) {
+    else if (player.health <= 0) {
         gameOver = true;
         fill('white');
         textAlign("center");
@@ -150,6 +193,6 @@ function scoreDisplay() {
     fill('white');
     textSize(30);
     textAlign("left");
-    text("score: " + score + "        " + "life: " + life, 30, 30);
+    text("score: " + score + "        " + "life: " + player.health, 30, 30);
 }
 
