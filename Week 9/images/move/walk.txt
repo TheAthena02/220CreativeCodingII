@@ -1,0 +1,10 @@
+../images/move/Walk (1).png
+../images/move/Walk (2).png
+../images/move/Walk (3).png
+../images/move/Walk (4).png
+../images/move/Walk (5).png
+../images/move/Walk (6).png
+../images/move/Walk (7).png
+../images/move/Walk (8).png
+../images/move/Walk (9).png
+../images/move/Walk (10).png
